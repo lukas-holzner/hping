@@ -16,7 +16,7 @@ pytest-mock = "^3.15"
 black = "^25.9"
 flake8 = "^7.0"
 mypy = "^1.18"
-isort = ">=6,<8"
+isort = ">=6,<9"
 pre-commit = "^4.3"
 
 [tool.poetry.scripts]
