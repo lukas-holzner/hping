@@ -414,6 +414,7 @@ description = "Mypyc runtime library"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
+markers = "platform_python_implementation != \"PyPy\""
 files = [
     {file = "librt-0.16.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:96f576f2711f8519152ec76d0e599243555c1f07679fa73606ca8c8c868c0be6"},
     {file = "librt-0.16.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:2bec3818c7da7c96ceae0ef5915a3d16c52dd08f3ea913bf1fe8568c447c7978"},
@@ -832,18 +833,18 @@ dev = ["pre-commit", "pytest-asyncio", "tox"]
 
 [[package]]
 name = "python-discovery"
-version = "1.6.1"
+version = "1.6.2"
 description = "Python interpreter discovery"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "python_discovery-1.6.1-py3-none-any.whl", hash = "sha256:d43fcdef879fe795352bd13ccf8d185ba5a9f86f36cfcd00529f596e737442b3"},
-    {file = "python_discovery-1.6.1.tar.gz", hash = "sha256:cf87d3627dfb4412437fdd5b13eae402607722998d21567993aedbc59b23c15e"},
+    {file = "python_discovery-1.6.2-py3-none-any.whl", hash = "sha256:f0c697f95a3aaec4174a6e5e58f5885e25768684bafc76f1afde384709ebdcf2"},
+    {file = "python_discovery-1.6.2.tar.gz", hash = "sha256:cd1738ca1d37c86ef9d0b654dd46fcee1e41c97c6add12575e8501ced39afdb4"},
 ]
 
 [package.dependencies]
-filelock = ">=3.15.4"
+filelock = ">=3.16.1"
 
 [[package]]
 name = "pytokens"
