@@ -76,7 +76,7 @@
       "@semantic-release/exec",
       {
         "verifyReleaseCmd": "echo ${nextRelease.version}",
-        "prepareCmd": "poetry version ${nextRelease.version}"
+        "prepareCmd": "poetry version ${nextRelease.version} && poetry build"
       }
     ],
     [

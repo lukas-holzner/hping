@@ -6,16 +6,17 @@ on:
     branches:
       - main
     paths:
-      # Only trigger on significant changes, not dependency updates
       - "hping/**"
       - "tests/**"
       - "docs/**"
       - "README.md"
-      # Exclude pyproject.toml to avoid dependency update triggers
-      # - 'pyproject.toml'
+      - "pyproject.toml"
+      - "poetry.lock"
+      - ".github/workflows/**"
 
 jobs:
   release:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,31 +33,26 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: "3.10"
+          python-version: "3.15"
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          poetry install
+          poetry install --no-interaction
+
+      - name: Run tests before release
+        run: |
+          poetry run pytest tests/ -v
 
       - name: Install semantic-release
         run: |
-          npm install -g semantic-release@23
-          npm install -g @semantic-release/changelog@6
-          npm install -g @semantic-release/exec@6
-          npm install -g @semantic-release/git@10
-          npm install -g @semantic-release/github@10
-          npm install -g conventional-changelog-conventionalcommits@7
-
-      - name: Build distribution
-        run: |
-          poetry build
+          npm install --no-audit --no-fund
 
       - name: Release
         env:

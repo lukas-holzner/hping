@@ -244,6 +244,123 @@ class TestClient(unittest.TestCase):
         output = mock_stdout.getvalue()
         self.assertIn("Invalid header format", output)
 
+    @patch("hping.client.httpx.Client")
+    def test_hping_default_stats(self, mock_client_class):
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"ok"
+        mock_response.http_version = "1.1"
+        mock_response.history = []
+        mock_client.request.return_value = mock_response
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+            hping("https://example.com", 0.01, 1)
+
+        self.assertIn("2 bytes from https://example.com", mock_stdout.getvalue())
+        mock_client.close.assert_called_once()
+
+    @patch("hping.client.httpx.Client")
+    def test_hping_non_json_data(self, mock_client_class):
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"ok"
+        mock_response.http_version = "1.1"
+        mock_response.history = []
+        mock_client.request.return_value = mock_response
+
+        with patch("sys.stdout", new_callable=io.StringIO):
+            hping(
+                "http://example.com",
+                0.01,
+                1,
+                method="POST",
+                data="plain text body",
+                stats=self.stats,
+            )
+
+        call_args = mock_client.request.call_args
+        self.assertEqual(call_args[1]["content"], "plain text body")
+        self.assertNotIn("Content-Type", call_args[1]["headers"])
+
+    @patch("hping.client.httpx.Client")
+    def test_hping_json_data_preserves_custom_content_type(self, mock_client_class):
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"ok"
+        mock_response.http_version = "1.1"
+        mock_response.history = []
+        mock_client.request.return_value = mock_response
+
+        with patch("sys.stdout", new_callable=io.StringIO):
+            hping(
+                "http://example.com",
+                0.01,
+                1,
+                method="POST",
+                headers=["content-type: application/vnd.api+json"],
+                data='{"key": "value"}',
+                stats=self.stats,
+            )
+
+        call_args = mock_client.request.call_args
+        self.assertEqual(
+            call_args[1]["headers"]["content-type"], "application/vnd.api+json"
+        )
+        self.assertNotIn("Content-Type", call_args[1]["headers"])
+
+    @patch("hping.client.httpx.Client")
+    def test_hping_unexpected_exception(self, mock_client_class):
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+        mock_client.request.side_effect = RuntimeError("Unexpected crash")
+
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+            hping("http://example.com", 0.01, 1, stats=self.stats)
+
+        output = mock_stdout.getvalue()
+        self.assertIn("Unexpected error", output)
+        self.assertIn("Unexpected crash", output)
+        self.assertEqual(self.stats["transmitted"], 1)
+        self.assertEqual(self.stats["received"], 0)
+
+    def test_invalid_url_scheme(self):
+        with patch("sys.stdout", new_callable=io.StringIO):
+            with self.assertRaises(ValueError) as context:
+                hping("file:///etc/passwd", 0.1, 1, stats=self.stats)
+            self.assertIn("Invalid URL", str(context.exception))
+
+            with self.assertRaises(ValueError):
+                hping("example.com", 0.1, 1, stats=self.stats)
+
+            with self.assertRaises(ValueError):
+                hping("http://", 0.1, 1, stats=self.stats)
+
+    def test_invalid_numeric_parameters(self):
+        with self.assertRaises(ValueError) as ctx:
+            hping("http://example.com", -1.0, 1, stats=self.stats)
+        self.assertIn("Interval must be non-negative", str(ctx.exception))
+
+        with self.assertRaises(ValueError) as ctx:
+            hping("http://example.com", 0.1, 1, timeout=0, stats=self.stats)
+        self.assertIn("Timeout must be positive", str(ctx.exception))
+
+        with self.assertRaises(ValueError) as ctx:
+            hping("http://example.com", 0.1, 0, stats=self.stats)
+        self.assertIn("Count must be a positive integer", str(ctx.exception))
+
+        with self.assertRaises(ValueError) as ctx:
+            hping("http://example.com", 0.1, 1, max_redirects=-1, stats=self.stats)
+        self.assertIn("Max redirects must be non-negative", str(ctx.exception))
+
 
 if __name__ == "__main__":
     unittest.main()
