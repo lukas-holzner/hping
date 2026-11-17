@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: dependabot/fetch-metadata@v3
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -35,12 +35,16 @@ jobs:
           This PR contains a major version update that may include breaking changes.
           Please review carefully before merging.
 
-          **Dependency:** ${{ steps.metadata.outputs.dependency-names }}
-          **Update type:** ${{ steps.metadata.outputs.update-type }}
-          **Previous version:** ${{ steps.metadata.outputs.previous-version }}
-          **New version:** ${{ steps.metadata.outputs.new-version }}
+          **Dependency:** ${DEP_NAMES}
+          **Update type:** ${UPDATE_TYPE}
+          **Previous version:** ${PREV_VERSION}
+          **New version:** ${NEW_VERSION}
 
           To merge this PR after review, comment: \`@dependabot merge\`"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEP_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          PREV_VERSION: ${{ steps.metadata.outputs.previous-version }}
+          NEW_VERSION: ${{ steps.metadata.outputs.new-version }}

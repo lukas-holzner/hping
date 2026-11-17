@@ -103,6 +103,28 @@ class TestMain(unittest.TestCase):
         call_args = mock_hping.call_args
         self.assertEqual(call_args[1]["method"], "POST")
 
+    @patch("hping.main.hping", side_effect=ValueError("Invalid URL 'bad'"))
+    @patch("hping.main.setup_signal_handler")
+    def test_main_value_error(self, mock_setup, mock_hping):
+        test_args = ["hping", "bad"]
+
+        with patch.object(sys, "argv", test_args):
+            with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+                with self.assertRaises(SystemExit) as ctx:
+                    main()
+
+        self.assertEqual(ctx.exception.code, 1)
+        self.assertIn("Error: Invalid URL 'bad'", mock_stdout.getvalue())
+        mock_setup.assert_called_once()
+        mock_hping.assert_called_once()
+
+    @patch("hping.main.main")
+    def test_dunder_main_execution(self, mock_main):
+        import runpy
+
+        runpy.run_module("hping", run_name="__main__")
+        mock_main.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,6 +3,7 @@
 import json
 import time
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 import httpx
 
@@ -40,6 +41,22 @@ def hping(
     if stats is None:
         stats = {"transmitted": 0, "received": 0, "rtt_times": []}
 
+    # Validate URL scheme and host
+    parsed_url = urlparse(url)
+    if parsed_url.scheme.lower() not in ("http", "https") or not parsed_url.netloc:
+        print(f"Error: Invalid URL '{url}'. Must start with http:// or https://")
+        raise ValueError(f"Invalid URL '{url}'")
+
+    # Validate numeric parameters
+    if interval < 0:
+        raise ValueError("Interval must be non-negative")
+    if timeout <= 0:
+        raise ValueError("Timeout must be positive")
+    if count is not None and count <= 0:
+        raise ValueError("Count must be a positive integer")
+    if max_redirects < 0:
+        raise ValueError("Max redirects must be non-negative")
+
     # Parse and validate headers
     parsed_headers = parse_headers(headers)
 
@@ -47,10 +64,7 @@ def hping(
     if data:
         try:
             json.loads(data)
-            if (
-                "Content-Type" not in parsed_headers
-                and "content-type" not in parsed_headers
-            ):
+            if not any(k.lower() == "content-type" for k in parsed_headers):
                 parsed_headers["Content-Type"] = "application/json"
         except json.JSONDecodeError:
             pass  # Not JSON, leave as is

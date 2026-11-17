@@ -51,6 +51,28 @@ class TestHeaders(unittest.TestCase):
         expected = {"Authorization": "Bearer: token: with: colons"}
         self.assertEqual(result, expected)
 
+    def test_parse_headers_empty_name(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+            headers = [": value", "   : another", "Valid-Name: value"]
+            result = parse_headers(headers)
+
+        output = mock_stdout.getvalue()
+        self.assertIn("Header name cannot be empty", output)
+        self.assertEqual(result, {"Valid-Name": "value"})
+
+    def test_parse_headers_crlf_injection(self):
+        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
+            headers = [
+                "X-Test: val\r\nInjected: bad",
+                "X-Newline: val\nInjected: bad",
+                "X-Valid: safe",
+            ]
+            result = parse_headers(headers)
+
+        output = mock_stdout.getvalue()
+        self.assertIn("Invalid header format", output)
+        self.assertEqual(result, {"X-Valid": "safe"})
+
 
 if __name__ == "__main__":
     unittest.main()

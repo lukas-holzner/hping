@@ -87,16 +87,20 @@ def main() -> None:
         print(f"Error: Unsupported HTTP method '{method}'")
         sys.exit(1)
 
-    hping(
-        args.url,
-        args.interval,
-        args.count,
-        method=method,
-        timeout=args.timeout,
-        headers=args.header,
-        data=args.data,
-        follow_redirects=not args.no_follow_redirects,
-        max_redirects=args.max_redirects,
-        http2=args.http2,
-        stats=stats,
-    )
+    try:
+        hping(
+            args.url,
+            args.interval,
+            args.count,
+            method=method,
+            timeout=args.timeout,
+            headers=args.header,
+            data=args.data,
+            follow_redirects=not args.no_follow_redirects,
+            max_redirects=args.max_redirects,
+            http2=args.http2,
+            stats=stats,
+        )
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)

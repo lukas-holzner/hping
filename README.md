@@ -2,8 +2,9 @@
 
 <div align="center">
 
+[![CI](https://github.com/lukas-holzner/hping/actions/workflows/ci.yml/badge.svg)](https://github.com/lukas-holzner/hping/actions/workflows/ci.yml)
 [![Release](https://github.com/lukas-holzner/hping/actions/workflows/release.yml/badge.svg)](https://github.com/lukas-holzner/hping/actions/workflows/release.yml)
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://python.org)
+[![Python Version](https://img.shields.io/badge/python-3.11%20--%203.15-blue.svg)](https://python.org)
 [![PyPI Version](https://img.shields.io/pypi/v/hping.svg)](https://pypi.org/project/hping/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -16,21 +17,21 @@
 
 </div>
 
-`hping` is a command-line tool that works like `ping`, but instead of sending ICMP packets, it repeatedly makes HTTP GET requests to check if a website is available.
+`hping` is a command-line tool that works like `ping`, but instead of sending ICMP packets, it repeatedly makes HTTP requests to check if a website or service is available.
 
 ## ✨ Key Features
 
 - 🔄 **Continuous monitoring** - Send periodic HTTP requests like traditional ping
 - 📊 **Real-time statistics** - View response times, success rates, and packet loss
-- ⚡ **Lightweight & fast** - Minimal resource usage with quick response times
+- ⚡ **Lightweight & fast** - Minimal resource usage with quick response times and HTTP/2 support
 - 🎯 **Simple interface** - Familiar ping-like command-line experience
-- 🐍 **Python 3.10+** - Modern Python with type hints and clean code
+- 🐍 **Python 3.11 – 3.15** - Modern Python with type hints and clean code
 
 ## 📦 Installation
 
 ### Requirements
 
-- Python 3.10 or higher
+- Python 3.11 or higher (tested up to Python 3.15)
 - Internet connection
 
 ### Install from PyPI
@@ -57,16 +58,23 @@ hping https://www.example.com
 
 ## ⚙️ Options
 
-- `-i`, `--interval`: Interval in seconds between requests (default is 1.0 seconds).
-- `-c`, `--count`: Number of pings to send. (default is none)
+- `-i`, `--interval`: Interval in seconds between requests (default: `1.0`).
+- `-c`, `--count`: Number of pings to send (default: unlimited).
+- `-X`, `--method`: HTTP method to use (`GET`, `POST`, `PUT`, `DELETE`, `HEAD`, `PATCH`; default: `GET`).
+- `--timeout`: Request timeout in seconds (default: `10.0`).
+- `-H`, `--header`: Custom HTTP header in `'Name: Value'` format (can be specified multiple times).
+- `-d`, `--data`: Request body data (auto-detects JSON format).
+- `--no-follow-redirects`: Disable following HTTP redirects.
+- `--max-redirects`: Maximum number of redirects to follow (default: `5`).
+- `--http2`: Force HTTP/2 usage.
 
 ## 💡 Example
 
 ```bash
-hping https://www.example.com -i 2
+hping https://www.example.com -i 2 -c 5 --http2
 ```
 
-This will send HTTP GET requests to `https://www.example.com` every 2 seconds.
+This will send 5 HTTP/2 GET requests to `https://www.example.com` every 2 seconds.
 
 ## 📋 About
 

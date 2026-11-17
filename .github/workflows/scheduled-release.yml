@@ -46,35 +46,25 @@ jobs:
         if: steps.check-changes.outputs.has-changes == 'true'
         uses: actions/setup-python@v7
         with:
-          python-version: "3.10"
+          python-version: "3.15"
 
       - name: Set up Node.js
         if: steps.check-changes.outputs.has-changes == 'true'
         uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install Python dependencies
         if: steps.check-changes.outputs.has-changes == 'true'
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          poetry install
+          poetry install --no-interaction
 
       - name: Install semantic-release
         if: steps.check-changes.outputs.has-changes == 'true'
         run: |
-          npm install -g semantic-release@23
-          npm install -g @semantic-release/changelog@6
-          npm install -g @semantic-release/exec@6
-          npm install -g @semantic-release/git@10
-          npm install -g @semantic-release/github@10
-          npm install -g conventional-changelog-conventionalcommits@7
-
-      - name: Build distribution
-        if: steps.check-changes.outputs.has-changes == 'true'
-        run: |
-          poetry build
+          npm install --no-audit --no-fund
 
       - name: Release
         if: steps.check-changes.outputs.has-changes == 'true'
