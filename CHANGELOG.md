@@ -1,3 +1,12 @@
+## [0.8.1](https://github.com/lukas-holzner/hping/compare/v0.8.0...v0.8.1) (2026-11-23)
+
+### Dependencies
+
+* **deps-dev:** bump filelock from 4.2.11 to 4.2.12 ([8e007d4](https://github.com/lukas-holzner/hping/commit/8e007d4a89d7ab1ff30c31853a1fb3b0eb3197d5))
+* **deps-dev:** bump librt from 0.16.0 to 0.17.0 ([53acde3](https://github.com/lukas-holzner/hping/commit/53acde315227498863742807f1f5a4a8ac43abdd))
+* **deps-dev:** bump platformdirs from 4.14.5 to 4.14.8 ([a9aeec5](https://github.com/lukas-holzner/hping/commit/a9aeec5d666476c975e50477afdea17ef3f66dd4))
+* **deps-dev:** bump python-discovery from 1.9.5 to 1.9.6 ([0b51dad](https://github.com/lukas-holzner/hping/commit/0b51dad4e304bb7c178ca4f2728e910b4310da66))
+
 ## [0.8.0](https://github.com/lukas-holzner/hping/compare/v0.7.1...v0.8.0) (2026-11-17)
 
 ### Features
